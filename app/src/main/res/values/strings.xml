@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">PlanCraft</string>
+    <string name="enter_your_name">Enter Your Name</string>
+    <string name="your_name">Your Name</string>
+    <string name="terms_and_condition">Terms and Condition</string>
+    <string name="termsandcondition">This ia a completely offline application. We do not share your data. your data is completely private and remains on your phone. To test this you can turn off any internet connection and see that the app still works</string>
+    <string name="temrsandconditiontext">I ACCEPT TERMS AND CONDITIONS</string>
+    <string name="continuebuttontext">Continue</string>
 </resources>
