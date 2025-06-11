@@ -7,30 +7,32 @@
     android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="24dp"
     tools:context=".RegistrationActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/enter_your_name"
-        android:textSize="20dp"
+        android:textSize="22dp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"
     />
 
     <EditText
         android:id="@+id/username"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/your_name"
         android:inputType="textPersonName"
+        android:textSize="18dp"
         android:layout_marginBottom="24dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/terms_and_condition"
-        android:textSize="20dp"
+        android:textSize="22dp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"
         />
@@ -41,20 +43,21 @@
         android:text="@string/termsandcondition"
         android:textSize="15dp"
         android:layout_marginBottom="16dp"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
         android:justificationMode="inter_word"
         />
 
     <CheckBox
+        android:id="@+id/termsandconditioncheckbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/temrsandconditiontext"
+        android:textSize="15dp"
         android:layout_marginBottom="24dp"
         />
 
     <Button
-        android:layout_width="wrap_content"
+        android:id="@+id/continuebutton"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/continuebuttontext"
         android:enabled="false"
