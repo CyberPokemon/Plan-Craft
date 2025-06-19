@@ -197,4 +197,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    public int markTaskAsComplete(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_IS_COMPLETED, 1);
+
+        int rows=db.update(TABLE_TASK, values, KEY_ID + "=?", new String[]{String.valueOf(id)});
+
+        db.close();
+        return rows;
+    }
 }
