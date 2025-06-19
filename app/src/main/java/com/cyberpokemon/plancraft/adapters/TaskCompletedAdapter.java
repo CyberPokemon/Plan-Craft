@@ -61,14 +61,14 @@ public class TaskCompletedAdapter extends RecyclerView.Adapter<TaskCompletedAdap
         Task task= taskList.get(position);
         holder.taskTitle.setText(task.getTitle());
         holder.taskDescription.setText(task.getDescription());
-        holder.taskDeadline.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm",task.getDeadlineMillis()));
+        holder.taskDeadline.setText("Deadline : "+android.text.format.DateFormat.format("yyyy-MM-dd HH:mm",task.getDeadlineMillis()));
         if (task.getCompletedTimeMillis() > 0) {
-            holder.taskCompletedOn.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm", task.getCompletedTimeMillis()));
+            holder.taskCompletedOn.setText("Completed On : "+android.text.format.DateFormat.format("yyyy-MM-dd HH:mm", task.getCompletedTimeMillis()));
         } else {
             holder.taskCompletedOn.setText("N/A");
         }
 
-        holder.taskCompletedOn.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm",task.getCompletedTimeMillis()));
+//        holder.taskCompletedOn.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm",task.getCompletedTimeMillis()));
 
         holder.btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override

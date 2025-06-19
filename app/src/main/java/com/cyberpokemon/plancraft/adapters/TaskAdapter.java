@@ -61,7 +61,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         Task task = taskList.get(position);
         holder.taskTitle.setText(task.getTitle());
         holder.taskDescription.setText(task.getDescription());
-        holder.taskDeadline.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm",task.getDeadlineMillis()));
+        holder.taskDeadline.setText("Deadline : "+android.text.format.DateFormat.format("yyyy-MM-dd HH:mm",task.getDeadlineMillis()));
 
         holder.btnComplete.setOnClickListener(new View.OnClickListener() {
             @Override
