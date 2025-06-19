@@ -9,6 +9,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,14 +25,22 @@ import android.widget.Toast;
 import com.cyberpokemon.plancraft.DatabaseHelper;
 import com.cyberpokemon.plancraft.R;
 import com.cyberpokemon.plancraft.Task;
+import com.cyberpokemon.plancraft.adapters.TaskAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class OngoingFragment extends Fragment {
     private TextView deadlineTextView;
 
     private Calendar selectedDeadline = Calendar.getInstance();
+    private RecyclerView recyclerView;
+    private List<Task> taskList = new ArrayList<>();
+
+    TaskAdapter taskAdapter;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,6 +51,11 @@ public class OngoingFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        recyclerView=view.findViewById(R.id.taskRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        loadTaskFromDatabase();
+
         FloatingActionButton addTaskButton = view.findViewById(R.id.addTaskButton);
 
         addTaskButton.setOnClickListener(new View.OnClickListener() {
@@ -49,6 +64,14 @@ public class OngoingFragment extends Fragment {
                 showAddTaskDialogBox();
             }
         });
+    }
+
+    private void loadTaskFromDatabase() {
+        DatabaseHelper db = new DatabaseHelper(getContext());
+        taskList = db.getAllIncompleteTasks();
+
+        taskAdapter= new TaskAdapter(taskList,getContext(),this::loadTaskFromDatabase);
+        recyclerView.setAdapter(taskAdapter);
     }
 
     private void showAddTaskDialogBox() {
@@ -134,6 +157,7 @@ public class OngoingFragment extends Fragment {
                 Toast.makeText(getContext(), "Task added successfully", Toast.LENGTH_SHORT).show();
 
                 dialog.dismiss();
+                loadTaskFromDatabase();
             }
 
         });
