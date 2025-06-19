@@ -122,5 +122,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rows;
     }
 
+    public int deleteTask(int  id)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int rows = db.delete(TABLE_TASK,KEY_ID+"=?",new String[]{String.valueOf((id))});
+        db.close();
+        return rows;
+    }
+
+
+
 
 }
