@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.cyberpokemon.plancraft.R;
@@ -120,23 +121,31 @@ public class OngoingFragment extends Fragment {
             selectedDeadline.set(Calendar.MONTH, m);
             selectedDeadline.set(Calendar.DAY_OF_MONTH, d);
 
-            int hour = current.get(Calendar.HOUR_OF_DAY);
-            int minute = current.get(Calendar.MINUTE);
-            TimePickerDialog timePicker = new TimePickerDialog(requireContext(), (view1, h, m1) -> {
-                selectedDeadline.set(Calendar.HOUR_OF_DAY, h);
-                selectedDeadline.set(Calendar.MINUTE, m1);
+            int currentHour = current.get(Calendar.HOUR_OF_DAY);
+            int currentMinute = current.get(Calendar.MINUTE);
+
+            TimePickerDialog timePicker = new TimePickerDialog(requireContext(), (view1, selectedHour, selectedMinute) -> {
+                selectedDeadline.set(Calendar.HOUR_OF_DAY, selectedHour);
+                selectedDeadline.set(Calendar.MINUTE, selectedMinute);
                 selectedDeadline.set(Calendar.SECOND, 0);
                 selectedDeadline.set(Calendar.MILLISECOND, 0);
 
-                deadlineTextView.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm", selectedDeadline));
-            }, hour, minute, true);
+                // Check if selected deadline is in the past
+                if (selectedDeadline.before(current)) {
+                    Toast.makeText(requireContext(), "You can't select a past time.", Toast.LENGTH_SHORT).show();
+                    deadlineTextView.setText("Select Deadline"); // Reset the text
+                } else {
+                    deadlineTextView.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm", selectedDeadline));
+                }
+            }, currentHour, currentMinute, false);
 
             timePicker.show();
         }, year, month, day);
 
+        // Restrict date selection to today and future
+        datePicker.getDatePicker().setMinDate(current.getTimeInMillis());
+
         datePicker.show();
-
     }
-
 
 }
