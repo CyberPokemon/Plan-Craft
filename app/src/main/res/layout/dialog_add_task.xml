@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Title -->
+        <EditText
+            android:id="@+id/editTextTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Title"
+            android:inputType="text"
+            android:maxLines="1" />
+
+        <!-- Description -->
+        <EditText
+            android:id="@+id/editTextDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Description (optional)"
+            android:inputType="textMultiLine"
+            android:minLines="2"
+            android:layout_marginTop="12dp" />
+
+        <!-- Deadline (opens date+time picker) -->
+        <TextView
+            android:id="@+id/textViewDeadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Select Deadline"
+            android:padding="12dp"
+            android:background="@drawable/bg_edittext"
+            android:textColor="#000"
+            android:layout_marginTop="12dp" />
+
+        <!-- Reminder Time Before Deadline -->
+        <EditText
+            android:id="@+id/editTextReminderBefore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Reminder before deadline (e.g., 2h or 30m)"
+            android:inputType="text"
+            android:layout_marginTop="12dp" />
+
+        <!-- Follow-Up Reminder Frequency -->
+        <EditText
+            android:id="@+id/editTextFollowUp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Follow-up frequency (e.g., 1h, 6h)"
+            android:inputType="text"
+            android:layout_marginTop="12dp" />
+
+        <!-- Deadline Crossed Reminder Frequency -->
+        <EditText
+            android:id="@+id/editTextDeadlineCrossed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Deadline-crossed frequency (e.g., 1h, 1d)"
+            android:inputType="text"
+            android:layout_marginTop="12dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SUBMIT"
+            android:id="@+id/submitbutton"
+            />
+    </LinearLayout>
+</ScrollView>
