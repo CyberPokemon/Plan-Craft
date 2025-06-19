@@ -3,6 +3,7 @@ package com.cyberpokemon.plancraft.fragmentfiles;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,7 +20,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.cyberpokemon.plancraft.DatabaseHelper;
 import com.cyberpokemon.plancraft.R;
+import com.cyberpokemon.plancraft.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Calendar;
@@ -68,11 +71,11 @@ public class OngoingFragment extends Fragment {
         NumberPicker npCrossedMinutes = dialogboxview.findViewById(R.id.npCrossedMinutes);
 
         initializeNumberPicker(npReminderHours, 0, 23,2);
-        initializeNumberPicker(npReminderMinutes, 0, 59,00);
+        initializeNumberPicker(npReminderMinutes, 0, 59,0);
         initializeNumberPicker(npFollowUpHours, 0, 23,1);
-        initializeNumberPicker(npFollowUpMinutes, 0, 59,00);
+        initializeNumberPicker(npFollowUpMinutes, 0, 59,0);
         initializeNumberPicker(npCrossedHours, 0, 23,1);
-        initializeNumberPicker(npCrossedMinutes, 0, 59,00);
+        initializeNumberPicker(npCrossedMinutes, 0, 59,0);
 
         deadlineTextView.setOnClickListener(v->showDateTimePicker());
 
@@ -87,15 +90,51 @@ public class OngoingFragment extends Fragment {
             int followUpMs = (npFollowUpHours.getValue() * 60 + npFollowUpMinutes.getValue()) * 60 * 1000;
             int crossedMs = (npCrossedHours.getValue() * 60 + npCrossedMinutes.getValue()) * 60 * 1000;
 
-            Toast.makeText(getContext(),
-                    "Title: " + title + "\n" +
-                            "Deadline: " + selectedDeadline.getTime() + "\n" +
-                            "Reminder: " + reminderBeforeMs / 60000 + " mins\n" +
-                            "Follow-up: " + followUpMs / 60000 + " mins\n" +
-                            "Crossed: " + crossedMs / 60000 + " mins",
-                    Toast.LENGTH_LONG).show();
 
-            dialog.dismiss();
+            if (title.isEmpty()) {
+                Toast.makeText(getContext(), "Please enter a title", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (deadlineMillis <= System.currentTimeMillis()) {
+                Toast.makeText(getContext(), "Please select a future deadline", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Task newTask = new Task(title, description, deadlineMillis, false, reminderBeforeMs, followUpMs, crossedMs);
+
+            DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+            long result = dbHelper.addTask(newTask);
+
+            if (result == -1) {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+                alertDialogBuilder.setTitle("ERROR");
+                alertDialogBuilder.setMessage("Data cannot be Saved. Some Error occured");
+
+
+                alertDialogBuilder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+//                dialog.dismiss();
+            }
+            else {
+//                Toast.makeText(getContext(),
+//                        "Title: " + title + "\n" +
+//                                "Deadline: " + selectedDeadline.getTime() + "\n" +
+//                                "Reminder: " + reminderBeforeMs / 60000 + " mins\n" +
+//                                "Follow-up: " + followUpMs / 60000 + " mins\n" +
+//                                "Crossed: " + crossedMs / 60000 + " mins",
+//                        Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Task added successfully", Toast.LENGTH_SHORT).show();
+
+                dialog.dismiss();
+            }
 
         });
 

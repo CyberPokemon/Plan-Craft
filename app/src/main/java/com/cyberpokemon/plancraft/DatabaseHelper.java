@@ -52,7 +52,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void addTask(Task task)
+    public long addTask(Task task)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -65,8 +65,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_FOLLOW_UP_FREQUENCY, task.getFollowUpFrequencyMillis());
         values.put(KEY_DEADLINE_CROSSED_FREQUENCY,task.getDeadlineCrossedMillis());
 
-        db.insert(TABLE_TASK,null,values);
+        long result=db.insert(TABLE_TASK,null,values);
         db.close();
+        return result;
     }
 
 
