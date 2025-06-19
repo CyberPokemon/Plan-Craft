@@ -25,6 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_REMINDER_BEFORE="reminder_before";
     private static final String KEY_FOLLOW_UP_FREQUENCY="follow_up_frequency";
     private static final String KEY_DEADLINE_CROSSED_FREQUENCY="deadline_crossed_frequency";
+    private static final String KEY_COMPLETED_TIME="completed_time";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -40,7 +41,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + KEY_IS_COMPLETED + " INTEGER,"
                 + KEY_REMINDER_BEFORE + " INTEGER,"
                 + KEY_FOLLOW_UP_FREQUENCY + " INTEGER,"
-                + KEY_DEADLINE_CROSSED_FREQUENCY + " INTEGER"
+                + KEY_DEADLINE_CROSSED_FREQUENCY + " INTEGER,"
+                + KEY_COMPLETED_TIME+" INTEGER"
                 + ")";
         db.execSQL(CREATE_TASK_TABLE);
     }
@@ -64,6 +66,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_REMINDER_BEFORE, task.getReminderBeforeMillis());
         values.put(KEY_FOLLOW_UP_FREQUENCY, task.getFollowUpFrequencyMillis());
         values.put(KEY_DEADLINE_CROSSED_FREQUENCY,task.getDeadlineCrossedMillis());
+        values.put(KEY_COMPLETED_TIME,task.getCompletedTimeMillis());
 
         long result=db.insert(TABLE_TASK,null,values);
         db.close();
@@ -90,7 +93,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getLong(cursor.getColumnIndexOrThrow(KEY_REMINDER_BEFORE)),
                         cursor.getLong(cursor.getColumnIndexOrThrow(KEY_FOLLOW_UP_FREQUENCY)),
                         cursor.getLong(cursor.getColumnIndexOrThrow(KEY_DEADLINE_CROSSED_FREQUENCY))
-
                 );
 
                 task.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
@@ -190,6 +192,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 );
 
                 task.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
+                task.setCompletedTimeMillis(cursor.getLong(cursor.getColumnIndexOrThrow(KEY_COMPLETED_TIME)));
 
                 taskList.add(task);
 
@@ -207,6 +210,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_IS_COMPLETED, 1);
+        values.put(KEY_COMPLETED_TIME, System.currentTimeMillis());
 
         int rows=db.update(TABLE_TASK, values, KEY_ID + "=?", new String[]{String.valueOf(id)});
 

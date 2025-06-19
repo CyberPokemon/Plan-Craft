@@ -11,6 +11,7 @@ public class Task {
     private long reminderBeforeMillis;
     private long followUpFrequencyMillis;
     private long deadlineCrossedMillis;
+    private long completedTimeMillis;
 
     public Task(String title, String description, long deadlineMillis, boolean isCompleted, long reminderBforeMillis, long followUpFrequencyMillis, long deadlineCrossedMillis) {
         this.title = title;
@@ -20,6 +21,7 @@ public class Task {
         this.reminderBeforeMillis = reminderBforeMillis;
         this.followUpFrequencyMillis = followUpFrequencyMillis;
         this.deadlineCrossedMillis = deadlineCrossedMillis;
+        this.completedTimeMillis=-1;
     }
 
     public Task(String title, String description, long deadlineMillis) {
@@ -96,5 +98,13 @@ public class Task {
 
     public void setDeadlineCrossedMillis(long deadlineCrossedMillis) {
         this.deadlineCrossedMillis = deadlineCrossedMillis;
+    }
+
+    public long getCompletedTimeMillis() {
+        return completedTimeMillis;
+    }
+
+    public void setCompletedTimeMillis(long completedTimeMillis) {
+        this.completedTimeMillis = completedTimeMillis;
     }
 }
