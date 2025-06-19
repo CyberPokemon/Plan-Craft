@@ -131,7 +131,69 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rows;
     }
 
+    public List<Task> getAllIncompleteTasks()
+    {
+        List<Task> taskList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
 
+        Cursor cursor = db.query(TABLE_TASK,null,KEY_IS_COMPLETED+" =?",new String[]{"0"},null,null,KEY_DEADLINE+ " ASC");
+
+        if(cursor.moveToFirst())
+        {
+            do
+            {
+                Task task = new Task(
+                        cursor.getString(cursor.getColumnIndexOrThrow(KEY_TITLE)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(KEY_DESCRIPTION)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(KEY_DEADLINE)),
+                        false,
+                        cursor.getLong(cursor.getColumnIndexOrThrow(KEY_REMINDER_BEFORE)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(KEY_FOLLOW_UP_FREQUENCY)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(KEY_DEADLINE_CROSSED_FREQUENCY))
+
+                );
+
+                taskList.add(task);
+
+            }while(cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return taskList;
+    }
+
+    public List<Task> getAllCompleteTasks()
+    {
+        List<Task> taskList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_TASK,null,KEY_IS_COMPLETED+" =?",new String[]{"1"},null,null,KEY_DEADLINE+ " ASC");
+
+        if(cursor.moveToFirst())
+        {
+            do
+            {
+                Task task = new Task(
+                        cursor.getString(cursor.getColumnIndexOrThrow(KEY_TITLE)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(KEY_DESCRIPTION)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(KEY_DEADLINE)),
+                        true,
+                        cursor.getLong(cursor.getColumnIndexOrThrow(KEY_REMINDER_BEFORE)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(KEY_FOLLOW_UP_FREQUENCY)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(KEY_DEADLINE_CROSSED_FREQUENCY))
+
+                );
+
+                taskList.add(task);
+
+            }while(cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return taskList;
+    }
 
 
 }
