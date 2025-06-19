@@ -93,6 +93,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 );
 
+                task.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
+
                 taskList.add(task);
 
             }while(cursor.moveToNext());
@@ -153,6 +155,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getLong(cursor.getColumnIndexOrThrow(KEY_DEADLINE_CROSSED_FREQUENCY))
 
                 );
+                task.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
 
                 taskList.add(task);
 
@@ -185,6 +188,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getLong(cursor.getColumnIndexOrThrow(KEY_DEADLINE_CROSSED_FREQUENCY))
 
                 );
+
+                task.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
 
                 taskList.add(task);
 

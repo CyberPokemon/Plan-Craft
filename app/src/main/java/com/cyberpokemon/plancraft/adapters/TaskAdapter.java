@@ -22,6 +22,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     private List<Task> taskList;
     private Context context;
     private Runnable refreshcallback;
+    private int result;
 
     public TaskAdapter(List<Task> taskList) {
         this.taskList = taskList;
@@ -66,14 +67,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             @Override
             public void onClick(View v) {
                 DatabaseHelper db = new DatabaseHelper(context);
-                int result = db.markTaskAsComplete(task.getId());
+                result = db.markTaskAsComplete(task.getId());
                 if(result!=-1) {
-                    Toast.makeText(context, "Marked as Complete", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Task Marked as Complete", Toast.LENGTH_SHORT).show();
                     refreshcallback.run();
                 }
                 else
                 {
-                    Toast.makeText(context, "Error : FAILED TO DELETE TASK", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Error : FAILED TO MARK COMPLETE TASK", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -81,9 +82,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             @Override
             public void onClick(View v) {
                 DatabaseHelper db = new DatabaseHelper(context);
-                db.deleteTask(task.getId());
-                Toast.makeText(context,"Marked as Complete",Toast.LENGTH_SHORT).show();
-                refreshcallback.run();
+                result = db.deleteTask(task.getId());
+                if(result!=-1)
+                {
+                    Toast.makeText(context, "Task Deleted", Toast.LENGTH_SHORT).show();
+                    refreshcallback.run();
+                }
+                else
+                {
+                    Toast.makeText(context, "Error : FAILED TO DELETE TASK", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
