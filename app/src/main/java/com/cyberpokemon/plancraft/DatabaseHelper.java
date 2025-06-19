@@ -102,6 +102,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return taskList;
     }
 
+    public int updateTask(int id, Task task)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_TITLE, task.getTitle());
+        values.put(KEY_DESCRIPTION, task.getDescription());
+        values.put(KEY_DEADLINE, task.getDeadlineMillis());
+        values.put(KEY_IS_COMPLETED, task.isCompleted() ? 1 : 0);
+        values.put(KEY_REMINDER_BEFORE, task.getReminderBeforeMillis());
+        values.put(KEY_FOLLOW_UP_FREQUENCY, task.getFollowUpFrequencyMillis());
+        values.put(KEY_DEADLINE_CROSSED_FREQUENCY,task.getDeadlineCrossedMillis());
+
+        int rows = db.update(TABLE_TASK,values,KEY_ID+"=?",new String[]{String.valueOf(id)});
+
+        db.close();
+
+        return rows;
+    }
 
 
 }
