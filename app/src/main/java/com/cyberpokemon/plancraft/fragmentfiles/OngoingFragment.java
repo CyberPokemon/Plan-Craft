@@ -77,6 +77,7 @@ public class OngoingFragment extends Fragment {
         deadlineTextView.setOnClickListener(v->showDateTimePicker());
 
         Button submitButton = dialogboxview.findViewById(R.id.submitbutton);
+        Button cancelButton = dialogboxview.findViewById(R.id.cancelbutton);
         submitButton.setOnClickListener(v -> {
             String title = editTextTitle.getText().toString().trim();
             String description = editTextDescription.getText().toString().trim();
@@ -97,6 +98,10 @@ public class OngoingFragment extends Fragment {
             dialog.dismiss();
 
         });
+
+        cancelButton.setOnClickListener((v-> {
+            dialog.dismiss();
+        }));
 
         dialog.show();
     }

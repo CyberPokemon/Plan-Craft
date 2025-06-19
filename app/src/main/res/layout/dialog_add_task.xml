@@ -141,13 +141,32 @@
                 android:layout_height="wrap_content"
                 android:text="min" />
         </LinearLayout>
-
-        <Button
-            android:id="@+id/submitbutton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="SUBMIT"
-            android:layout_marginTop="20dp"
-            android:layout_gravity="center" />
+            android:orientation="horizontal"
+            android:gravity="center"
+            >
+
+            <Button
+                android:id="@+id/submitbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SUBMIT"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="40dp"
+                android:layout_gravity="center" />
+
+            <Button
+                android:id="@+id/cancelbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CANCEL"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/red"/>
+        </LinearLayout>
+
+
     </LinearLayout>
 </ScrollView>
