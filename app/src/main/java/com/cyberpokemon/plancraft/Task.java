@@ -7,7 +7,7 @@ public class Task {
     private long deadlineMillis;
     private  boolean isCompleted;
 
-    private long reminderBforeMillis;
+    private long reminderBeforeMillis;
     private long followUpFrequencyMillis;
     private long deadlineCrossedMillis;
 
@@ -16,7 +16,7 @@ public class Task {
         this.description = description;
         this.deadlineMillis = deadlineMillis;
         this.isCompleted = isCompleted;
-        this.reminderBforeMillis = reminderBforeMillis;
+        this.reminderBeforeMillis = reminderBforeMillis;
         this.followUpFrequencyMillis = followUpFrequencyMillis;
         this.deadlineCrossedMillis = deadlineCrossedMillis;
     }
@@ -28,7 +28,7 @@ public class Task {
 
         this.isCompleted=false;
 
-        this.reminderBforeMillis=2*60*60*1000L; //default 2 hours
+        this.reminderBeforeMillis=2*60*60*1000L; //default 2 hours
         this.followUpFrequencyMillis=60*60*1000L; //default 1 hours
         this.deadlineCrossedMillis=60*60*1000L; //default 1 hours
     }
@@ -66,11 +66,11 @@ public class Task {
     }
 
     public long getReminderBforeMillis() {
-        return reminderBforeMillis;
+        return reminderBeforeMillis;
     }
 
     public void setReminderBforeMillis(long reminderBforeMillis) {
-        this.reminderBforeMillis = reminderBforeMillis;
+        this.reminderBeforeMillis = reminderBforeMillis;
     }
 
     public long getFollowUpFrequencyMillis() {
