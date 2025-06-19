@@ -65,11 +65,11 @@ public class Task {
         isCompleted = completed;
     }
 
-    public long getReminderBforeMillis() {
+    public long getReminderBeforeMillis() {
         return reminderBeforeMillis;
     }
 
-    public void setReminderBforeMillis(long reminderBforeMillis) {
+    public void setReminderBeforeMillis(long reminderBforeMillis) {
         this.reminderBeforeMillis = reminderBforeMillis;
     }
 

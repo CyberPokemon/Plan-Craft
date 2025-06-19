@@ -1,10 +1,15 @@
 package com.cyberpokemon.plancraft;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -27,11 +32,76 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
+        String CREATE_TASK_TABLE = "CREATE TABLE " + TABLE_TASK + "("
+                + KEY_ID + " INTEGER PRIMARY KEY,"
+                + KEY_TITLE + " TEXT,"
+                + KEY_DESCRIPTION + " TEXT,"
+                + KEY_DEADLINE + " INTEGER,"
+                + KEY_IS_COMPLETED + " INTEGER,"
+                + KEY_REMINDER_BEFORE + " INTEGER,"
+                + KEY_FOLLOW_UP_FREQUENCY + " INTEGER,"
+                + KEY_DEADLINE_CROSSED_FREQUENCY + " INTEGER"
+                + ")";
+        db.execSQL(CREATE_TASK_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASK);
 
+        onCreate(db);
     }
+
+    public void addTask(Task task)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_TITLE, task.getTitle());
+        values.put(KEY_DESCRIPTION, task.getDescription());
+        values.put(KEY_DEADLINE, task.getDeadlineMillis());
+        values.put(KEY_IS_COMPLETED, task.isCompleted() ? 1 : 0);
+        values.put(KEY_REMINDER_BEFORE, task.getReminderBeforeMillis());
+        values.put(KEY_FOLLOW_UP_FREQUENCY, task.getFollowUpFrequencyMillis());
+        values.put(KEY_DEADLINE_CROSSED_FREQUENCY,task.getDeadlineCrossedMillis());
+
+        db.insert(TABLE_TASK,null,values);
+        db.close();
+    }
+
+
+    public List<Task> getAllTask()
+    {
+        List<Task> taskList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_TASK,null,null,null,null,null,KEY_DEADLINE+" ASC");
+
+        if(cursor.moveToFirst())
+        {
+            do
+            {
+                Task task = new Task(
+                        cursor.getString(cursor.getColumnIndexOrThrow(KEY_TITLE)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(KEY_DESCRIPTION)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(KEY_DEADLINE)),
+                        cursor.getInt(cursor.getColumnIndexOrThrow(KEY_IS_COMPLETED))==1,
+                        cursor.getLong(cursor.getColumnIndexOrThrow(KEY_REMINDER_BEFORE)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(KEY_FOLLOW_UP_FREQUENCY)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(KEY_DEADLINE_CROSSED_FREQUENCY))
+
+                );
+
+                taskList.add(task);
+
+            }while(cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return taskList;
+    }
+
+
+
 }
