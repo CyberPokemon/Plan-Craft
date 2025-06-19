@@ -6,4 +6,6 @@
     <string name="termsandcondition">This ia a completely offline application. We do not share your data. your data is completely private and remains on your phone. To test this you can turn off any internet connection and see that the app still works.</string>
     <string name="temrsandconditiontext">I ACCEPT TERMS AND CONDITIONS</string>
     <string name="continuebuttontext">Continue</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
