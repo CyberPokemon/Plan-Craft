@@ -3,7 +3,7 @@
     <string name="enter_your_name">Enter Your Name</string>
     <string name="your_name">Your Name</string>
     <string name="terms_and_condition">Terms and Condition</string>
-    <string name="termsandcondition">This ia a completely offline application. We do not share your data. your data is completely private and remains on your phone. To test this you can turn off any internet connection and see that the app still works.</string>
+    <string name="termsandcondition">PlanCraft is a fully offline app designed to keep your data private and secure. All information you enter is stored locally on your device and is never shared, uploaded, or transmitted to any server. The app does not require an internet connection or user account to function. PlanCraft only requests notification permission so it can remind you about your tasks on time. By using this app, you agree to these terms and acknowledge that your data remains completely private and under your control.</string>
     <string name="temrsandconditiontext">I ACCEPT TERMS AND CONDITIONS</string>
     <string name="continuebuttontext">Continue</string>
     <!-- TODO: Remove or change this placeholder text -->
@@ -12,6 +12,6 @@
     <string name="plancraft">PlanCraft – Organize Your Life, Craft Your Future</string>
     <string name="about_description">A smart planner to manage your tasks with reminders and scheduling.</string>
     <string name="author_imon_mallik">Author: Imon Mallik</string>
-    <string name="version_no">Version: 0.8</string>
+    <string name="version_no">Version: 0.9</string>
     <string name="view_source_on_github">View Source on GitHub</string>
 </resources>
