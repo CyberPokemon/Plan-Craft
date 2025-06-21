@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     private Context context;
     private Runnable refreshcallback;
     private int result;
+    private OnTaskEditListener editListener;
 
     public TaskAdapter(List<Task> taskList) {
         this.taskList = taskList;
@@ -34,9 +36,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         this.refreshcallback = refreshcallback;
     }
 
+    public TaskAdapter(List<Task> taskList, Context context, Runnable refreshcallback, OnTaskEditListener editListener) {
+        this.taskList = taskList;
+        this.context = context;
+        this.refreshcallback = refreshcallback;
+        this.editListener = editListener;
+    }
+
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView taskTitle, taskDescription, taskDeadline;
         Button btnComplete, btnDelete;
+        ImageButton btnEdit;
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -45,6 +55,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             taskDeadline=itemView.findViewById(R.id.taskDeadline);
             btnComplete=itemView.findViewById(R.id.buttonMarkAsComplete);
             btnDelete=itemView.findViewById(R.id.buttonDeleteTask);
+            btnEdit=itemView.findViewById(R.id.buttonEditTask);
         }
     }
 
@@ -91,6 +102,20 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 else
                 {
                     Toast.makeText(context, "Error : FAILED TO DELETE TASK", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        holder.btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(editListener!=null)
+                {
+                    editListener.onTaskEdit(task);
+                }
+                else
+                {
+                    Toast.makeText(context, "Error : FAILED TO EDIT TASK", Toast.LENGTH_SHORT).show();
                 }
             }
         });
