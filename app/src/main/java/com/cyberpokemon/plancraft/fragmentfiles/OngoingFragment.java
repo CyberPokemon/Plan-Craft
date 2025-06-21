@@ -108,7 +108,12 @@ public class OngoingFragment extends Fragment {
 
         updateEditTextTitle.setText(task.getTitle());
         updateEditTextDescription.setText(task.getDescription());
-        updateDeadlineTextView.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm",task.getDeadlineMillis()));
+
+        Calendar initialDeadline = Calendar.getInstance();
+        initialDeadline.setTimeInMillis(task.getDeadlineMillis());
+        updateDeadlineTextView.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm", initialDeadline));
+        selectedDeadlineHolder[0] = initialDeadline;
+
 
         initializeNumberPicker(updateReminderHours,0,23,(int)(task.getReminderBeforeMillis()/(60*60*1000)));
         initializeNumberPicker(updateReminderMinutes,0,59,(int)((task.getReminderBeforeMillis()%(60*60*1000))/(60*1000)));
