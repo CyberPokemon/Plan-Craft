@@ -1,6 +1,7 @@
 package com.cyberpokemon.plancraft.notification;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
@@ -47,6 +48,8 @@ public class TaskNotificationWorker extends Worker {
         }
 
         NotificationHelper.showNotification(getApplicationContext(), "Task Reminder", message);
+        Log.d("TaskNotificationWorker", "Type: " + type + ", Title: " + title);
+
         return Result.success();
     }
 }

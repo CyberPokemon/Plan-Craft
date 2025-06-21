@@ -65,7 +65,14 @@ public class TaskScheduler {
     }
 
     private static void enqueueRepeatingOverdueWork(Context context, Task task, String tag) {
-        if (System.currentTimeMillis() < task.getDeadlineMillis()) return;
+//        if (System.currentTimeMillis() < task.getDeadlineMillis()) return;
+        long delay = task.getDeadlineMillis() - System.currentTimeMillis();
+        if (delay > 0) {
+            // Wait until deadline is passed
+            enqueueOneTimeWork(context, task, "OVERDUE", delay+task.getDeadlineCrossedMillis(), tag);
+            return;
+        }
+
 
         Data data = new Data.Builder()
                 .putLong("task_id", task.getId())
@@ -73,9 +80,17 @@ public class TaskScheduler {
                 .putString("type", "OVERDUE")
                 .build();
 
+//        PeriodicWorkRequest repeatingWork = new PeriodicWorkRequest.Builder(
+//                TaskNotificationWorker.class,
+//                task.getDeadlineCrossedMillis(), TimeUnit.MILLISECONDS
+//        )
+//                .setInputData(data)
+//                .addTag(tag)
+//                .build();
+
         PeriodicWorkRequest repeatingWork = new PeriodicWorkRequest.Builder(
                 TaskNotificationWorker.class,
-                task.getDeadlineCrossedMillis(), TimeUnit.MILLISECONDS
+                Math.max(task.getDeadlineCrossedMillis(), 15 * 60 * 1000), TimeUnit.MILLISECONDS
         )
                 .setInputData(data)
                 .addTag(tag)
