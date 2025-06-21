@@ -31,12 +31,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class OngoingFragment extends Fragment {
     private TextView deadlineTextView;
     private TextView updateDeadlineTextView;
 
-    private Calendar selectedDeadline = Calendar.getInstance();
     private RecyclerView recyclerView;
     private List<Task> taskList = new ArrayList<>();
 
@@ -94,7 +94,13 @@ public class OngoingFragment extends Fragment {
         NumberPicker updateCrossedHours = dialogboxview.findViewById(R.id.updatenpCrossedHours);
         NumberPicker updateCrossedMinutes = dialogboxview.findViewById(R.id.updatenpCrossedMinutes);
 
-        updateDeadlineTextView.setOnClickListener(v->showDateTimePicker(updateDeadlineTextView));
+        final Calendar[] selectedDeadlineHolder = new Calendar[1];
+
+        updateDeadlineTextView.setOnClickListener(v -> {
+            showDateTimePicker(updateDeadlineTextView, selectedDate -> {
+                selectedDeadlineHolder[0] = selectedDate;
+            });
+        });
 
 
         Button updateButton = dialogboxview.findViewById(R.id.updatebutton);
@@ -118,7 +124,6 @@ public class OngoingFragment extends Fragment {
 
                 String title = updateEditTextTitle.getText().toString().trim();
                 String description = updateEditTextDescription.getText().toString().trim();
-                long deadlineMillis = selectedDeadline.getTimeInMillis();
 
                 int reminderBeforeMs = (updateReminderHours.getValue() * 60 + updateReminderMinutes.getValue()) * 60 * 1000;
                 int followUpMs = (updateFollowUpHours.getValue() * 60 + updateFollowUpMinutes.getValue()) * 60 * 1000;
@@ -128,6 +133,13 @@ public class OngoingFragment extends Fragment {
                     Toast.makeText(getContext(), "Please enter a title", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                long deadlineMillis = selectedDeadlineHolder[0] != null ? selectedDeadlineHolder[0].getTimeInMillis() : -1;
+
+                if (deadlineMillis == -1) {
+                    Toast.makeText(getContext(), "Please select a deadline", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
 
                 if (deadlineMillis <= System.currentTimeMillis()) {
                     Toast.makeText(getContext(), "Please select a future deadline", Toast.LENGTH_SHORT).show();
@@ -193,15 +205,20 @@ public class OngoingFragment extends Fragment {
         initializeNumberPicker(npCrossedHours, 0, 23,1);
         initializeNumberPicker(npCrossedMinutes, 0, 59,0);
 
-        deadlineTextView.setOnClickListener(v->showDateTimePicker(deadlineTextView));
+        final Calendar[] selectedDeadlineHolder = new Calendar[1];
+
+        deadlineTextView.setOnClickListener(v -> {
+            showDateTimePicker(deadlineTextView, selectedDate -> {
+                selectedDeadlineHolder[0] = selectedDate;
+            });
+        });
+
 
         Button submitButton = dialogboxview.findViewById(R.id.submitbutton);
         Button cancelButton = dialogboxview.findViewById(R.id.cancelbutton);
         submitButton.setOnClickListener(v -> {
             String title = editTextTitle.getText().toString().trim();
             String description = editTextDescription.getText().toString().trim();
-            long deadlineMillis = selectedDeadline.getTimeInMillis();
-
 
             int reminderBeforeMs = (npReminderHours.getValue() * 60 + npReminderMinutes.getValue()) * 60 * 1000;
             int followUpMs = (npFollowUpHours.getValue() * 60 + npFollowUpMinutes.getValue()) * 60 * 1000;
@@ -210,6 +227,13 @@ public class OngoingFragment extends Fragment {
 
             if (title.isEmpty()) {
                 Toast.makeText(getContext(), "Please enter a title", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            long deadlineMillis = selectedDeadlineHolder[0] != null ? selectedDeadlineHolder[0].getTimeInMillis() : -1;
+
+            if (deadlineMillis == -1) {
+                Toast.makeText(getContext(), "Please select a deadline", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -272,69 +296,35 @@ public class OngoingFragment extends Fragment {
         picker.setWrapSelectorWheel(true);
     }
 
-    private void showDateTimePicker() {
+    private void showDateTimePicker(TextView targetTextView, Consumer<Calendar> onDateTimeSelected) {
         final Calendar current = Calendar.getInstance();
+        final Calendar tempDeadline = Calendar.getInstance();
+
         int year = current.get(Calendar.YEAR);
         int month = current.get(Calendar.MONTH);
         int day = current.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog datePicker = new DatePickerDialog(requireContext(), (view, y, m, d) -> {
-            selectedDeadline.set(Calendar.YEAR, y);
-            selectedDeadline.set(Calendar.MONTH, m);
-            selectedDeadline.set(Calendar.DAY_OF_MONTH, d);
+            tempDeadline.set(Calendar.YEAR, y);
+            tempDeadline.set(Calendar.MONTH, m);
+            tempDeadline.set(Calendar.DAY_OF_MONTH, d);
 
             int currentHour = current.get(Calendar.HOUR_OF_DAY);
             int currentMinute = current.get(Calendar.MINUTE);
 
             TimePickerDialog timePicker = new TimePickerDialog(requireContext(), (view1, selectedHour, selectedMinute) -> {
-                selectedDeadline.set(Calendar.HOUR_OF_DAY, selectedHour);
-                selectedDeadline.set(Calendar.MINUTE, selectedMinute);
-                selectedDeadline.set(Calendar.SECOND, 0);
-                selectedDeadline.set(Calendar.MILLISECOND, 0);
+                tempDeadline.set(Calendar.HOUR_OF_DAY, selectedHour);
+                tempDeadline.set(Calendar.MINUTE, selectedMinute);
+                tempDeadline.set(Calendar.SECOND, 0);
+                tempDeadline.set(Calendar.MILLISECOND, 0);
 
-                // Check if selected deadline is in the past
-                if (selectedDeadline.before(current)) {
+                if (tempDeadline.before(current)) {
                     Toast.makeText(requireContext(), "You can't select a past time.", Toast.LENGTH_SHORT).show();
-                    deadlineTextView.setText("Select Deadline"); // Reset the text
+                    targetTextView.setText("Select Deadline");
+                    onDateTimeSelected.accept(null);
                 } else {
-                    deadlineTextView.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm", selectedDeadline));
-                }
-            }, currentHour, currentMinute, false);
-
-            timePicker.show();
-        }, year, month, day);
-
-        // Restrict date selection to today and future
-        datePicker.getDatePicker().setMinDate(current.getTimeInMillis());
-
-        datePicker.show();
-    }
-
-    private void showDateTimePicker(TextView targetTextView) {
-        final Calendar current = Calendar.getInstance();
-        int year = current.get(Calendar.YEAR);
-        int month = current.get(Calendar.MONTH);
-        int day = current.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePicker = new DatePickerDialog(requireContext(), (view, y, m, d) -> {
-            selectedDeadline.set(Calendar.YEAR, y);
-            selectedDeadline.set(Calendar.MONTH, m);
-            selectedDeadline.set(Calendar.DAY_OF_MONTH, d);
-
-            int currentHour = current.get(Calendar.HOUR_OF_DAY);
-            int currentMinute = current.get(Calendar.MINUTE);
-
-            TimePickerDialog timePicker = new TimePickerDialog(requireContext(), (view1, selectedHour, selectedMinute) -> {
-                selectedDeadline.set(Calendar.HOUR_OF_DAY, selectedHour);
-                selectedDeadline.set(Calendar.MINUTE, selectedMinute);
-                selectedDeadline.set(Calendar.SECOND, 0);
-                selectedDeadline.set(Calendar.MILLISECOND, 0);
-
-                if (selectedDeadline.before(current)) {
-                    Toast.makeText(requireContext(), "You can't select a past time.", Toast.LENGTH_SHORT).show();
-                    targetTextView.setText("Select Deadline"); // Reset
-                } else {
-                    targetTextView.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm", selectedDeadline));
+                    targetTextView.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm", tempDeadline));
+                    onDateTimeSelected.accept(tempDeadline);
                 }
             }, currentHour, currentMinute, false);
 
@@ -344,6 +334,4 @@ public class OngoingFragment extends Fragment {
         datePicker.getDatePicker().setMinDate(current.getTimeInMillis());
         datePicker.show();
     }
-
-
 }
