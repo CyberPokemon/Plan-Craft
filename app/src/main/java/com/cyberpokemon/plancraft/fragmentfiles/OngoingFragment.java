@@ -160,7 +160,8 @@ public class OngoingFragment extends Fragment {
                 task.setDeadlineCrossedMillis(crossedMs);
 
                 DatabaseHelper db = new DatabaseHelper(getContext());
-                int result = db.updateTask(task.getId(),task);
+//                int result = db.updateTask(task.getId(),task);
+                int result = db.updateTask(getContext(),task.getId(),task);
                 if(result!=-1) {
                     Toast.makeText(getContext(), "Task Updated", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
@@ -250,7 +251,8 @@ public class OngoingFragment extends Fragment {
             Task newTask = new Task(title, description, deadlineMillis, false, reminderBeforeMs, followUpMs, crossedMs);
 
             DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-            long result = dbHelper.addTask(newTask);
+//            long result = dbHelper.addTask(newTask);
+            long result = dbHelper.addTask(getContext(),newTask);
 
             if (result == -1) {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());

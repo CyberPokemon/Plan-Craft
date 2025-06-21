@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+import com.cyberpokemon.plancraft.notification.TaskScheduler;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +71,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_COMPLETED_TIME,task.getCompletedTimeMillis());
 
         long result=db.insert(TABLE_TASK,null,values);
+
         db.close();
+
+        return result;
+    }
+
+    public long addTask(Context context,Task task)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_TITLE, task.getTitle());
+        values.put(KEY_DESCRIPTION, task.getDescription());
+        values.put(KEY_DEADLINE, task.getDeadlineMillis());
+        values.put(KEY_IS_COMPLETED, task.isCompleted() ? 1 : 0);
+        values.put(KEY_REMINDER_BEFORE, task.getReminderBeforeMillis());
+        values.put(KEY_FOLLOW_UP_FREQUENCY, task.getFollowUpFrequencyMillis());
+        values.put(KEY_DEADLINE_CROSSED_FREQUENCY,task.getDeadlineCrossedMillis());
+        values.put(KEY_COMPLETED_TIME,task.getCompletedTimeMillis());
+
+        long result=db.insert(TABLE_TASK,null,values);
+
+
+        task.setId((int) result);
+        TaskScheduler.scheduleTaskNotifications(context, task);
+        db.close();
+
         return result;
     }
 
@@ -127,6 +155,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rows;
     }
 
+    public int updateTask(Context context,int id, Task task)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_TITLE, task.getTitle());
+        values.put(KEY_DESCRIPTION, task.getDescription());
+        values.put(KEY_DEADLINE, task.getDeadlineMillis());
+        values.put(KEY_IS_COMPLETED, task.isCompleted() ? 1 : 0);
+        values.put(KEY_REMINDER_BEFORE, task.getReminderBeforeMillis());
+        values.put(KEY_FOLLOW_UP_FREQUENCY, task.getFollowUpFrequencyMillis());
+        values.put(KEY_DEADLINE_CROSSED_FREQUENCY,task.getDeadlineCrossedMillis());
+
+        int rows = db.update(TABLE_TASK,values,KEY_ID+"=?",new String[]{String.valueOf(id)});
+
+        task.setId(id);
+        TaskScheduler.cancelTaskNotifications(context, task);  // cancel previous
+        TaskScheduler.scheduleTaskNotifications(context, task); // reschedule with updated timing
+
+        db.close();
+
+        return rows;
+    }
+
     public int deleteTask(int  id)
     {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -135,6 +187,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return rows;
     }
+
+    public int deleteTask(Context context, int id)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Need to load task first to cancel its notifications
+        Task dummy = new Task("", "", 0); // temporary
+        dummy.setId(id);
+        TaskScheduler.cancelTaskNotifications(context, dummy);
+
+        int rows = db.delete(TABLE_TASK,KEY_ID+"=?",new String[]{String.valueOf((id))});
+        db.close();
+        return rows;
+    }
+
 
     public List<Task> getAllIncompleteTasks()
     {
@@ -207,6 +274,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public int markTaskAsComplete(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_IS_COMPLETED, 1);
+        values.put(KEY_COMPLETED_TIME, System.currentTimeMillis());
+
+        int rows=db.update(TABLE_TASK, values, KEY_ID + "=?", new String[]{String.valueOf(id)});
+
+        db.close();
+        return rows;
+    }
+
+    public int markTaskAsComplete(Context context, int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Task dummy = new Task("", "", 0);
+        dummy.setId(id);
+        TaskScheduler.cancelTaskNotifications(context, dummy);
 
         ContentValues values = new ContentValues();
         values.put(KEY_IS_COMPLETED, 1);

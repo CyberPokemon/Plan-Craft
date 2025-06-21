@@ -78,7 +78,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             @Override
             public void onClick(View v) {
                 DatabaseHelper db = new DatabaseHelper(context);
-                result = db.markTaskAsComplete(task.getId());
+//                result = db.markTaskAsComplete(task.getId());
+                result = db.markTaskAsComplete(context,task.getId());
                 if(result!=-1) {
                     Toast.makeText(context, "Task Marked as Complete", Toast.LENGTH_SHORT).show();
                     refreshcallback.run();
@@ -93,7 +94,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             @Override
             public void onClick(View v) {
                 DatabaseHelper db = new DatabaseHelper(context);
-                result = db.deleteTask(task.getId());
+//                result = db.deleteTask(task.getId());
+                result = db.deleteTask(context,task.getId());
                 if(result!=-1)
                 {
                     Toast.makeText(context, "Task Deleted", Toast.LENGTH_SHORT).show();
