@@ -13,6 +13,6 @@
     <string name="about_description">A smart planner to manage your tasks with reminders and scheduling.</string>
     <string name="author_imon_mallik">Author: Imon Mallik</string>
     <string name="version_no">Version: 0.11 (BETA)</string>
-    <string name="view_source_on_github">View Source on GitHub</string>
+    <string name="view_source_on_github">View Source Code on GitHub</string>
     <string name="Note_for_permission_for_notification">NOTE: Please provide the permission for notification to access the full functionality of the app.</string>
 </resources>

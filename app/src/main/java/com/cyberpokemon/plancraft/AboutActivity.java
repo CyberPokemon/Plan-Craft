@@ -45,7 +45,7 @@ public class AboutActivity extends AppCompatActivity {
 
         TextView githubLink = findViewById(R.id.github_link);
         githubLink.setOnClickListener(v -> {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/cyberpokemon/PlanCraft"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/CyberPokemon/Plan-Craft.git"));
             startActivity(browserIntent);
         });
     }
