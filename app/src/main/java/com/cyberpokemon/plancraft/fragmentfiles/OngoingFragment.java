@@ -31,11 +31,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class OngoingFragment extends Fragment {
     private TextView deadlineTextView;
+    private TextView updateDeadlineTextView;
 
-    private Calendar selectedDeadline = Calendar.getInstance();
     private RecyclerView recyclerView;
     private List<Task> taskList = new ArrayList<>();
 
@@ -70,8 +71,118 @@ public class OngoingFragment extends Fragment {
         DatabaseHelper db = new DatabaseHelper(getContext());
         taskList = db.getAllIncompleteTasks();
 
-        taskAdapter= new TaskAdapter(taskList,getContext(),this::loadTaskFromDatabase);
+//        taskAdapter= new TaskAdapter(taskList,getContext(),this::loadTaskFromDatabase);
+        taskAdapter = new TaskAdapter(taskList,getContext(),this::loadTaskFromDatabase,this::showEditTaskDialogBox);
         recyclerView.setAdapter(taskAdapter);
+    }
+
+    private void showEditTaskDialogBox(Task task) {
+        View dialogboxview = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_edit_task,null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setView(dialogboxview);
+
+        AlertDialog dialog = builder.create();
+
+        EditText updateEditTextTitle = dialogboxview.findViewById(R.id.updateEditTextTitle);
+        EditText updateEditTextDescription = dialogboxview.findViewById(R.id.updateEditTextDescription);
+        updateDeadlineTextView = dialogboxview.findViewById(R.id.updateTextViewDeadline);
+
+        NumberPicker updateReminderHours = dialogboxview.findViewById(R.id.updatenpReminderHours);
+        NumberPicker updateReminderMinutes = dialogboxview.findViewById(R.id.updatenpReminderMinutes);
+        NumberPicker updateFollowUpHours = dialogboxview.findViewById(R.id.updatenpFollowUpHours);
+        NumberPicker updateFollowUpMinutes = dialogboxview.findViewById(R.id.updatenpFollowUpMinutes);
+        NumberPicker updateCrossedHours = dialogboxview.findViewById(R.id.updatenpCrossedHours);
+        NumberPicker updateCrossedMinutes = dialogboxview.findViewById(R.id.updatenpCrossedMinutes);
+
+        final Calendar[] selectedDeadlineHolder = new Calendar[1];
+
+        updateDeadlineTextView.setOnClickListener(v -> {
+            showDateTimePicker(updateDeadlineTextView, selectedDate -> {
+                selectedDeadlineHolder[0] = selectedDate;
+            });
+        });
+
+
+        Button updateButton = dialogboxview.findViewById(R.id.updatebutton);
+        Button discardButton = dialogboxview.findViewById(R.id.discardbutton);
+
+        updateEditTextTitle.setText(task.getTitle());
+        updateEditTextDescription.setText(task.getDescription());
+
+        Calendar initialDeadline = Calendar.getInstance();
+        initialDeadline.setTimeInMillis(task.getDeadlineMillis());
+        updateDeadlineTextView.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm", initialDeadline));
+        selectedDeadlineHolder[0] = initialDeadline;
+
+
+        initializeNumberPicker(updateReminderHours,0,23,(int)(task.getReminderBeforeMillis()/(60*60*1000)));
+        initializeNumberPicker(updateReminderMinutes,0,59,(int)((task.getReminderBeforeMillis()%(60*60*1000))/(60*1000)));
+        initializeNumberPicker(updateFollowUpHours,0,23,(int)(task.getFollowUpFrequencyMillis()/(60*60*1000)));
+        initializeNumberPicker(updateFollowUpMinutes,0,59,(int)((task.getFollowUpFrequencyMillis()%(60*60*1000))/(60*1000)));
+        initializeNumberPicker(updateCrossedHours, 0, 23, (int)(task.getDeadlineCrossedMillis() / (60 * 60 * 1000)));
+        initializeNumberPicker(updateCrossedMinutes, 0, 59, (int)((task.getDeadlineCrossedMillis() % (60 * 60 * 1000)) / (60 * 1000)));
+
+
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String title = updateEditTextTitle.getText().toString().trim();
+                String description = updateEditTextDescription.getText().toString().trim();
+
+                int reminderBeforeMs = (updateReminderHours.getValue() * 60 + updateReminderMinutes.getValue()) * 60 * 1000;
+                int followUpMs = (updateFollowUpHours.getValue() * 60 + updateFollowUpMinutes.getValue()) * 60 * 1000;
+                int crossedMs = (updateCrossedHours.getValue() * 60 + updateCrossedMinutes.getValue()) * 60 * 1000;
+
+                if (title.isEmpty()) {
+                    Toast.makeText(getContext(), "Please enter a title", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                long deadlineMillis = selectedDeadlineHolder[0] != null ? selectedDeadlineHolder[0].getTimeInMillis() : -1;
+
+                if (deadlineMillis == -1) {
+                    Toast.makeText(getContext(), "Please select a deadline", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
+                if (deadlineMillis <= System.currentTimeMillis()) {
+                    Toast.makeText(getContext(), "Please select a future deadline", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
+                task.setTitle(title);
+                task.setDescription(description);
+                task.setDeadlineMillis(deadlineMillis);
+                task.setReminderBeforeMillis(reminderBeforeMs);
+                task.setFollowUpFrequencyMillis(followUpMs);
+                task.setDeadlineCrossedMillis(crossedMs);
+
+                DatabaseHelper db = new DatabaseHelper(getContext());
+//                int result = db.updateTask(task.getId(),task);
+                int result = db.updateTask(getContext(),task.getId(),task);
+                if(result!=-1) {
+                    Toast.makeText(getContext(), "Task Updated", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    loadTaskFromDatabase();
+                }
+                else
+                {
+                    Toast.makeText(getContext(), "Error : FAILED TO UPDATE TASK", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+        discardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
     private void showAddTaskDialogBox() {
@@ -100,14 +211,20 @@ public class OngoingFragment extends Fragment {
         initializeNumberPicker(npCrossedHours, 0, 23,1);
         initializeNumberPicker(npCrossedMinutes, 0, 59,0);
 
-        deadlineTextView.setOnClickListener(v->showDateTimePicker());
+        final Calendar[] selectedDeadlineHolder = new Calendar[1];
+
+        deadlineTextView.setOnClickListener(v -> {
+            showDateTimePicker(deadlineTextView, selectedDate -> {
+                selectedDeadlineHolder[0] = selectedDate;
+            });
+        });
+
 
         Button submitButton = dialogboxview.findViewById(R.id.submitbutton);
         Button cancelButton = dialogboxview.findViewById(R.id.cancelbutton);
         submitButton.setOnClickListener(v -> {
             String title = editTextTitle.getText().toString().trim();
             String description = editTextDescription.getText().toString().trim();
-            long deadlineMillis = selectedDeadline.getTimeInMillis();
 
             int reminderBeforeMs = (npReminderHours.getValue() * 60 + npReminderMinutes.getValue()) * 60 * 1000;
             int followUpMs = (npFollowUpHours.getValue() * 60 + npFollowUpMinutes.getValue()) * 60 * 1000;
@@ -119,15 +236,30 @@ public class OngoingFragment extends Fragment {
                 return;
             }
 
+            long deadlineMillis = selectedDeadlineHolder[0] != null ? selectedDeadlineHolder[0].getTimeInMillis() : -1;
+
+            if (deadlineMillis == -1) {
+                Toast.makeText(getContext(), "Please select a deadline", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if (deadlineMillis <= System.currentTimeMillis()) {
                 Toast.makeText(getContext(), "Please select a future deadline", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            long remainderBeforeDeadlineMs = deadlineMillis - reminderBeforeMs;
+            if (followUpMs>reminderBeforeMs)
+            {
+                Toast.makeText(getContext(), "Follow-up time should be less than reminder time", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             Task newTask = new Task(title, description, deadlineMillis, false, reminderBeforeMs, followUpMs, crossedMs);
 
             DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-            long result = dbHelper.addTask(newTask);
+//            long result = dbHelper.addTask(newTask);
+            long result = dbHelper.addTask(getContext(),newTask);
 
             if (result == -1) {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
@@ -178,42 +310,42 @@ public class OngoingFragment extends Fragment {
         picker.setWrapSelectorWheel(true);
     }
 
-    private void showDateTimePicker() {
+    private void showDateTimePicker(TextView targetTextView, Consumer<Calendar> onDateTimeSelected) {
         final Calendar current = Calendar.getInstance();
+        final Calendar tempDeadline = Calendar.getInstance();
+
         int year = current.get(Calendar.YEAR);
         int month = current.get(Calendar.MONTH);
         int day = current.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog datePicker = new DatePickerDialog(requireContext(), (view, y, m, d) -> {
-            selectedDeadline.set(Calendar.YEAR, y);
-            selectedDeadline.set(Calendar.MONTH, m);
-            selectedDeadline.set(Calendar.DAY_OF_MONTH, d);
+            tempDeadline.set(Calendar.YEAR, y);
+            tempDeadline.set(Calendar.MONTH, m);
+            tempDeadline.set(Calendar.DAY_OF_MONTH, d);
 
             int currentHour = current.get(Calendar.HOUR_OF_DAY);
             int currentMinute = current.get(Calendar.MINUTE);
 
             TimePickerDialog timePicker = new TimePickerDialog(requireContext(), (view1, selectedHour, selectedMinute) -> {
-                selectedDeadline.set(Calendar.HOUR_OF_DAY, selectedHour);
-                selectedDeadline.set(Calendar.MINUTE, selectedMinute);
-                selectedDeadline.set(Calendar.SECOND, 0);
-                selectedDeadline.set(Calendar.MILLISECOND, 0);
+                tempDeadline.set(Calendar.HOUR_OF_DAY, selectedHour);
+                tempDeadline.set(Calendar.MINUTE, selectedMinute);
+                tempDeadline.set(Calendar.SECOND, 0);
+                tempDeadline.set(Calendar.MILLISECOND, 0);
 
-                // Check if selected deadline is in the past
-                if (selectedDeadline.before(current)) {
+                if (tempDeadline.before(current)) {
                     Toast.makeText(requireContext(), "You can't select a past time.", Toast.LENGTH_SHORT).show();
-                    deadlineTextView.setText("Select Deadline"); // Reset the text
+                    targetTextView.setText("Select Deadline");
+                    onDateTimeSelected.accept(null);
                 } else {
-                    deadlineTextView.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm", selectedDeadline));
+                    targetTextView.setText(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm", tempDeadline));
+                    onDateTimeSelected.accept(tempDeadline);
                 }
             }, currentHour, currentMinute, false);
 
             timePicker.show();
         }, year, month, day);
 
-        // Restrict date selection to today and future
         datePicker.getDatePicker().setMinDate(current.getTimeInMillis());
-
         datePicker.show();
     }
-
 }
