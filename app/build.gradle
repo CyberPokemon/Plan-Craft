@@ -10,8 +10,8 @@ android {
         applicationId "com.cyberpokemon.plancraft"
         minSdk 24
         targetSdk 35
-        versionCode 910
-        versionName "0.11 (BETA)"
+        versionCode 11
+        versionName "1.0 (STABLE)"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
