@@ -24,10 +24,9 @@ Whether you're a student, professional, entrepreneur, or simply someone looking 
 ## 🔧 Technical Details
 
 - **Author:** Imon Mallik
-- **Curreent Version:** 0.9
+- **Curreent Version:** 1.0 (STABLE)
 - **Platform:** Android
 - **Offline Support:** Fully supported
-- **Source Code:** [View on GitHub](https://github.com/yourusername/plancraft) *(replace with actual link)*
 
 ## 📜 Terms and Conditions
 
