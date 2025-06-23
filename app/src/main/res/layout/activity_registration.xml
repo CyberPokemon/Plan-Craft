@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/termsandcondition"
-        android:textSize="15dp"
+        android:textSize="16dp"
         android:layout_marginBottom="16dp"
         android:justificationMode="inter_word"
         />
@@ -53,6 +53,14 @@
         android:text="@string/temrsandconditiontext"
         android:textSize="15dp"
         android:layout_marginBottom="24dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/Note_for_permission_for_notification"
+        android:textSize="18dp"
+        android:textColor="@color/red"
+        android:layout_marginBottom="10dp"
         />
 
     <Button
