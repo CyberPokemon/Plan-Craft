@@ -23,13 +23,13 @@ public class TaskScheduler {
 
         // 1. Reminder before deadline
         long reminderTime = task.getDeadlineMillis() - task.getReminderBeforeMillis();
-        if (reminderTime > now) {
+        if (reminderTime > now  && task.getReminderBeforeMillis()!=0) {
             enqueueOneTimeWork(context, task, "REMINDER_BEFORE", reminderTime - now, tag);
         }
 
         // 2. Follow-ups between reminder and deadline
         long followUpStart = reminderTime + task.getFollowUpFrequencyMillis();
-        while (followUpStart < task.getDeadlineMillis()) {
+        while (followUpStart < task.getDeadlineMillis() && task.getFollowUpFrequencyMillis()!=0) {
             enqueueOneTimeWork(context, task, "FOLLOW_UP", followUpStart - now, tag);
             followUpStart += task.getFollowUpFrequencyMillis();
         }
@@ -40,7 +40,10 @@ public class TaskScheduler {
         }
 
         // 4. Post-deadline repeating reminder
-        enqueueRepeatingOverdueWork(context, task, tag);
+        if(task.getDeadlineCrossedMillis()!=0)
+        {
+            enqueueRepeatingOverdueWork(context, task, tag);
+        }
     }
 
     public static void cancelTaskNotifications(Context context,Task task) {

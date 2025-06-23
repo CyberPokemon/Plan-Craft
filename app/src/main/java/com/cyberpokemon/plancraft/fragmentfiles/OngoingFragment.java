@@ -248,6 +248,13 @@ public class OngoingFragment extends Fragment {
                 return;
             }
 
+            long remainderBeforeDeadlineMs = deadlineMillis - reminderBeforeMs;
+            if (followUpMs>reminderBeforeMs)
+            {
+                Toast.makeText(getContext(), "Follow-up time should be less than reminder time", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Task newTask = new Task(title, description, deadlineMillis, false, reminderBeforeMs, followUpMs, crossedMs);
 
             DatabaseHelper dbHelper = new DatabaseHelper(getContext());
